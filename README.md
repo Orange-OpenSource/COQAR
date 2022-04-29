@@ -1,7 +1,7 @@
 # QREW
 
 This repository contains the dataset CoQAR and the models trained for question rewriting.
-CoQAR is a corpus containing $4.5$K conversations from the Conversational Question-Answering dataset CoQA, for a total of $53$K follow-up question-answer pairs, in which each original question was manually annotated with at least 2 at most 3 out-of-context rewritings. 
+CoQAR is a corpus containing 4.5K conversations from the Conversational Question-Answering dataset CoQA, for a total of 53K follow-up question-answer pairs, in which each original question was manually annotated with at least 2 at most 3 out-of-context rewritings. 
 COQAR can be used for three NLP tasks: question paraphrasing, question rewriting and conversational question answering.
 In order to assess the quality of COQAR's rewritings, we conducted several experiments consisting in training and evaluating models for these three tasks.
 Our results support the idea that question rewriting can be used as a preprocessing step for (conversational and non-conversational) question answering models, thereby increasing their performances. 
