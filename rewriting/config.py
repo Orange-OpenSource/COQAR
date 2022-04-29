@@ -1,0 +1,6 @@
+ELDA_DATA_PATH = '/home/dnjz8995/qrew/data/ELDA/'
+CANARD_DATA_PATH = '/home/dnjz8995/qrew/data/CANARD/'
+QUAC_DATA_PATH = '/home/dnjz8995/qrew/data/QuAC/'
+T5v1_1_TOKENIZER_PATH = 'google/t5-v1_1-small'
+T5v1_1_PATH = 'google/t5-v1_1-small'
+TRAINED_MODELS_PATH = 'data/trained_models/'
