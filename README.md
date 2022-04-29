@@ -3,10 +3,10 @@ CoQAR is a corpus containing 4.5K conversations from the using open-source datas
 In CoQAR each original question was manually annotated with at least 2 at most 3 out-of-context rewritings. 
 
 The corpus CoQA contains passages from seven domains, which are public under the following licenses:
-•Literature and Wikipedia passages are shared under CC BY-SA 4.0 license. 
-•Children's stories are collected from MCTest which comes with MSR-LA license. 
-•Middle/High school exam passages are collected from RACE which comes with its own license. 
-•News passages are collected from the DeepMind CNN dataset which comes with Apache license. 
+ - Literature and Wikipedia passages are shared under CC BY-SA 4.0 license. 
+ - Children's stories are collected from MCTest which comes with MSR-LA license. 
+ - Middle/High school exam passages are collected from RACE which comes with its own license. 
+ - News passages are collected from the DeepMind CNN dataset which comes with Apache license. 
 
 We annotated each original question of CoQA with at least 2 at most 3 out-of-context rewritings. We agreed with Celine Fontaine that these annotations would be released as open source.
 Besides the annotations, we also provide the code both related to the paper "Question Rewriting on CoQA", in which we present the paraphrasing, question rewriting by using T5.  
