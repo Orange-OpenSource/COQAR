@@ -14,7 +14,5 @@ We annotated each original question of CoQA with at least 2 at most 3 out-of-con
 
 
 These annotations are released as open source.
-Besides the annotations, we also provide the code both related to the paper "Question Rewriting on CoQA", in which we present the paraphrasing, question rewriting by using T5.  
-
-In the paper: **CoQAR Question Rewriting on CoQA. Quentin Brabant, Gwenole Lecorve and Lina Rojas-Barahona, to be published in [LREC2022](https://lrec2022.lrec-conf.org/en/)**, we assess the quality of COQAR's annotations by conducting several experiments for question paraphrasing, question rewriting and conversational question answering. Our results support the idea that question rewriting can be used as a preprocessing step for  non-conversational question answering models, thereby increasing their performances. 
-The code presents the annotations and the models for question rewriting.
+Beside the annotations, we also provide the code for question rewriting by using T5.  The datasets and code are presented in the paper: **CoQAR Question Rewriting on CoQA. Quentin Brabant, Gwenole Lecorve and Lina Rojas-Barahona, to be published in [LREC2022](https://lrec2022.lrec-conf.org/en/)**, we assess the quality of COQAR's annotations by conducting several experiments for question paraphrasing, question rewriting and conversational question answering. Our results support the idea that question rewriting can be used as a preprocessing step for  non-conversational question answering models, thereby increasing their performances. 
+In this repository you can find the dataset with the annotations and the models for question rewriting.
