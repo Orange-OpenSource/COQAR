@@ -1,5 +1,5 @@
 # COQAR
-CoQAR is a corpus containing 4.5K conversations from the using open-source dataset Conversational Question-Answering dataset CoQA, for a total of 53K follow-up question-answer pairs. 
+CoQAR is a corpus containing 4.5K conversations from the using open-source dataset [Conversational Question-Answering dataset CoQA](https://stanfordnlp.github.io/coqa/), for a total of 53K follow-up question-answer pairs. 
 In CoQAR each original question was manually annotated with at least 2 at most 3 out-of-context rewritings. 
 
 The corpus CoQA contains passages from seven domains, which are public under the following licenses:
