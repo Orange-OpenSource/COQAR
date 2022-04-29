@@ -16,3 +16,7 @@ We annotated each original question of CoQA with at least 2 at most 3 out-of-con
 These annotations are released as open source.
 Beside the annotations, we also provide the code for question rewriting by using T5.  The datasets and code are presented in the paper: **CoQAR Question Rewriting on CoQA. Quentin Brabant, Gwenole Lecorve and Lina Rojas-Barahona, to be published in [LREC2022](https://lrec2022.lrec-conf.org/en/)**, we assess the quality of COQAR's annotations by conducting several experiments for question paraphrasing, question rewriting and conversational question answering. Our results support the idea that question rewriting can be used as a preprocessing step for  non-conversational question answering models, thereby increasing their performances. 
 In this repository you can find the dataset with the annotations and the models for question rewriting.
+
+The code is published under the licence Apache 2.0, as the models are taken from HuggingFace.
+The annotations are published under the licence CC-BY-SA 4.0.
+The original content of the dataset CoQA is under the distinct licences described above.
