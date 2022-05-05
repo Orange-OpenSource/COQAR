@@ -1,5 +1,5 @@
 This repository contains the dataset CoQAR and the code for training and evaluating question rewriting models.
-The datasets and model evaluations are presented in the paper: **CoQAR Question Rewriting on CoQA. Quentin Brabant, Gwenole Lecorve and Lina Rojas-Barahona, to be published in [LREC2022](https://lrec2022.lrec-conf.org/en/)**
+The datasets, as well as model training and evaluation methods are presented in the paper: **CoQAR Question Rewriting on CoQA. Quentin Brabant, Gwenole Lecorve and Lina Rojas-Barahona, to be published in [LREC2022](https://lrec2022.lrec-conf.org/en/)**
 
 
 # COQAR
