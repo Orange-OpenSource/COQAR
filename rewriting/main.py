@@ -9,19 +9,18 @@ import t5small
 
 def get_arguments():
     parser = argparse.ArgumentParser(description = '')
-    parser.add_argument('action', choices=['eval', 'pre-eval', 'train'])
+    parser.add_argument('action', choices=['eval', 'pre-eval', 'train'],
+                        help='"pre-eval" evaluates the model on dev-sets, while "eval" evaluates on test sets.')
     parser.add_argument('--dataset_name', choices=['canard', 'coqar', 'mixed'],
-                        help='only for training')
+                        help='Use this argument only when training. With "mixed", a mix of CANARD and COQAR is used.')
     parser.add_argument('--model_path', type=str, default='',
-                        help='only for test/eval')
-    parser.add_argument('--epochs', type=int)
-    parser.add_argument('--learning_rate', type=float)
-    parser.add_argument('--history_size', type=int)
+                        help='Only for eval/pre-eval. Path of the model to evaluate.')
+    parser.add_argument('--epochs', type=int, help='only for training')
+    parser.add_argument('--learning_rate', type=float, help='only for training')
+    parser.add_argument('--history_size', type=int, help='only for training')
     parser.add_argument('--batch_size', type=int)
-    parser.add_argument('--dropout_rate', type=float)
-    parser.add_argument('--include_story', dest='include_story', action='store_true')
-    parser.set_defaults(include_story=False)
-    parser.add_argument('--smoke_test', dest='smoke_test', action='store_true')
+    parser.add_argument('--dropout_rate', type=float, help='only for training')
+    parser.add_argument('--smoke_test', dest='smoke_test', action='store_true', help='only for training')
     parser.set_defaults(smoke_test=False)
     args = parser.parse_args()
     return args
@@ -50,20 +49,19 @@ if __name__ == '__main__':
         hparams['learning_rate'] = args.learning_rate
     if args.history_size != None:
         hparams['history_size'] = args.history_size
-    hparams['include_story'] = args.include_story
 
     if args.action in ['eval', 'pre-eval']:
         
         model = torch.load(args.model_path)
         if args.action == 'eval':
             
-            coqar = qrdatasets.get_coqar_test_set(args.include_story)
-            canard = qrdatasets.get_canard_test_set(args.include_story)
+            coqar = qrdatasets.get_coqar_test_set(hparams['include_story'])
+            canard = qrdatasets.get_canard_test_set(hparams['include_story'])
     
         if args.action == 'pre-eval':
         
-            _, coqar = qrdatasets.get_coqar_train_and_dev_sets(args.include_story)
-            canard = qrdatasets.get_canard_dev_set(args.include_story)
+            _, coqar = qrdatasets.get_coqar_train_and_dev_sets(hparams['include_story'])
+            canard = qrdatasets.get_canard_dev_set(hparams['include_story'])
 
         for data, dataset_name in [(coqar, 'coqar'), (canard, 'canard')]:
             predictions = evaluation.generate_predictions(
