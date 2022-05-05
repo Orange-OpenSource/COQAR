@@ -1,6 +1,6 @@
-from .utils import *
+from utils import *
 import torch
-from . import config
+import config
 from torch.utils.data import Dataset
 import pandas as pd
 import random
@@ -11,17 +11,6 @@ def word_count(text):
     tokenizer = RegexpTokenizer(r'\w+')
     tokens = tokenizer.tokenize(text)
     return len(tokens)
-
-def cannotanswer_ratio(data):
-    i = 0
-    cannot = 0
-    #print(data['input'])
-    for x in data['answer_spans']:
-        if 'CANNOTANSWER' in x or 'unknown' in x:
-            cannot += 1
-        i += 1
-
-    return cannot / i
 
 def distrib(l, normalize = False):
     if normalize:
@@ -36,13 +25,11 @@ def distrib(l, normalize = False):
             for i in range(min(l), max(l) + 1)
         }
 
-def elda_statistics():
-    path = config.ELDA_DATA_PATH
+def coqar_statistics():
+    path = config.COQAR_DATA_PATH
     raw_data = \
-            json_get(config.ELDA_DATA_PATH + 'dev/dev.json')['data'] + \
-            json_get(path + 'train/simple/train_simple.json')['data'] + \
-            json_get(path + 'train/double/annotator_1/train_double_1.json')['data'] + \
-            json_get(path + 'train/double/annotator_2/train_double_2.json')['data']
+        json_get(os.path.join(config.COQAR_DATA_PATH, 'dev/coqar-dev-v1.0.json'))['data'] + \
+        json_get(os.path.join(path,'train/coqar-train-v1.0.json'))['data']
                
     nb_passages = 0
     dialogue_lengths = []
@@ -81,6 +68,7 @@ def elda_statistics():
     print(f'Paraphrase length (min, avg, max): ({min(paraphrase_lengths)}, {statistics.mean(paraphrase_lengths)}, {max(paraphrase_lengths)})')
     print('paraphrase length (distribution) : ' +' '.join(f'({x}, {y})' for x, y in distrib(paraphrase_lengths, True).items()))
     print('# unknown:', nb_unknown/nb_questions)
+
 '''
 The function returns a dictionary with three keys: "input", "references", "context".
 Each key is associated to a list:
@@ -88,7 +76,7 @@ Each key is associated to a list:
     result["references"][i] is a list of human reformulations of result["input"][i][-1]
     result["context"][i] is the paragraph about which the dialogue result["input"][i] is
 '''
-def format_elda_data(data, include_story=False):
+def format_coqar_data(data, include_story=False):
     contexts, inputs, references, answers = [], [], [], []
     for dialogue in data:
         seq = []
@@ -107,10 +95,10 @@ def format_elda_data(data, include_story=False):
             seq.append(answer['input_text'])
     return {'input' : inputs, 'references' : references, 'context' : contexts, 'answer_spans' : answers}
 
-'''Same as format_elda_data but for canard'''
+'''Same as format_coqar_data but for canard'''
 def format_CANARD_data(data, include_story):
-    quac = json_get(config.QUAC_DATA_PATH + 'train_v0.2.json')['data'] + \
-            json_get(config.QUAC_DATA_PATH + 'val_v0.2.json')['data']
+    quac = json_get(os.path.join(config.QUAC_DATA_PATH, 'train_v0.2.json'))['data'] + \
+            json_get(os.path.join(config.QUAC_DATA_PATH, 'val_v0.2.json'))['data']
     
     if include_story:
         context_dic = {
@@ -143,7 +131,7 @@ def format_CANARD_data(data, include_story):
     return {'input' : input, 'references' : references, 'context' : context, 'answer_spans' : answers}
 
 '''Same as format_canard_data but with only first turn'''
-def format_nocontext_data(data, include_story):
+def format_nocontext_data(data):
 
     context, input, references = [], [], []
     for dic in data:
@@ -178,99 +166,79 @@ def shuffle_data(data, n = -1, remove_first_question = False):
     return {'input' : input, 'references' : references, 'context' : context, 'answer_spans' : answers}
 
 
-def get_elda_original_train_set(include_story):
-    path = config.ELDA_DATA_PATH
-    raw_data = json_get(path + 'train/simple/train_simple.json')['data'] + \
-               json_get(path + 'train/double/annotator_1/train_double_1.json')['data'] + \
-               json_get(path + 'train/double/annotator_2/train_double_2.json')['data']
-    return format_elda_data(raw_data, include_story)
+def get_coqar_original_train_set(include_story):
+    path = config.COQAR_DATA_PATH
+    raw_data = json_get(os.path.join(path,'train/coqar-train-v1.0.json'))['data']
+    return format_coqar_data(raw_data, include_story)
 
-def get_elda_train_and_dev_sets(include_story):
-    path = config.ELDA_DATA_PATH
-    raw_data =  json_get(path + 'train/simple/train_simple.json')['data'] + \
-            json_get(path + 'train/double/annotator_1/train_double_1.json')['data'] + \
-            json_get(path + 'train/double/annotator_2/train_double_2.json')['data']
-    data = format_elda_data(raw_data, include_story)
+def get_coqar_train_and_dev_sets(include_story):
+    path = config.COQAR_DATA_PATH
+    raw_data =  json_get(os.path.join(path,'train/coqar-train-v1.0.json'))['data']
+    data = format_coqar_data(raw_data, include_story)
     i = len(get_canard_dev_set(include_story)['input'])
     return split_data(data, i)
 
-def get_elda_all_sets(include_story):
-    path = config.ELDA_DATA_PATH
-    raw_data =  json_get(path + 'train/simple/train_simple.json')['data'] + \
-            json_get(path + 'train/double/annotator_1/train_double_1.json')['data'] + \
-            json_get(path + 'train/double/annotator_2/train_double_2.json')['data']
-    data = format_elda_data(raw_data, include_story)
-    return data 
 
-def get_elda_test_set(include_story):
-    raw_data = json_get(config.ELDA_DATA_PATH + 'dev/dev.json')['data']
-    return format_elda_data(raw_data, include_story)
+def get_coqar_test_set(include_story):
+    raw_data = json_get(os.path.join(config.COQAR_DATA_PATH,'dev/coqar-dev-v1.0.json'))['data']
+    return format_coqar_data(raw_data, include_story)
 
 def get_canard_train_set(include_story):
-    raw_data = json_get(config.CANARD_DATA_PATH + 'train.json')
+    raw_data = json_get(os.path.join(config.CANARD_DATA_PATH, 'train.json'))
     return format_CANARD_data(raw_data, include_story)
 
 def get_canard_dev_set(include_story):
-    raw_data = json_get(config.CANARD_DATA_PATH + 'dev.json')
+    raw_data = json_get(os.path.join(config.CANARD_DATA_PATH, 'dev.json'))
     return format_CANARD_data(raw_data, include_story)
 
 def get_canard_test_set(include_story):
-    raw_data = json_get(config.CANARD_DATA_PATH + 'test.json')
+    raw_data = json_get(os.path.join(config.CANARD_DATA_PATH, 'test.json'))
     return format_CANARD_data(raw_data, include_story)
 
 def get_canard_all_sets(include_story):
-    raw_data = json_get(config.CANARD_DATA_PATH + 'test.json') +\
-            json_get(config.CANARD_DATA_PATH + 'dev.json') +\
-            json_get(config.CANARD_DATA_PATH + 'train.json')
+    raw_data = json_get(os.path.join(config.CANARD_DATA_PATH, 'test.json')) +\
+            json_get(os.path.join(config.CANARD_DATA_PATH, 'dev.json')) +\
+            json_get(os.path.join(config.CANARD_DATA_PATH, 'train.json'))
     return format_CANARD_data(raw_data, include_story)
 
-def get_nocontext_train_set(include_story):
-    raw_data = json_get(config.CANARD_DATA_PATH + 'train.json')
-    return format_nocontext_data(raw_data, include_story)
-
-def get_nocontext_dev_set(include_story):
-    raw_data = json_get(config.CANARD_DATA_PATH + 'dev.json')
-    return format_nocontext_data(raw_data, include_story)
 
 '''
 Returns a mix of both datasets (train and dev)
-The mixed dev contains all rows of canard dev + as many rows from elda train
-The mixed train contains the remaining rows from elda train + all rows from canard train
+The mixed dev contains all rows of canard dev + as many rows from coqar train
+The mixed train contains the remaining rows from coqar train + all rows from canard train
 '''
 def get_mixed_train_and_dev_sets(include_story):
-    elda_train = get_elda_original_train_set(include_story)
+    coqar_train = get_coqar_original_train_set(include_story)
     canard_train = get_canard_train_set(include_story)
     canard_dev = get_canard_dev_set(include_story)
 
     i = len(canard_dev['input'])
 
-    train = {k : elda_train[k][:-i] + canard_train[k]
+    train = {k : coqar_train[k][:-i] + canard_train[k]
              for k in ['input', 'references', 'context']}
-    dev = {k: elda_train[k][-i:] + canard_dev[k]
+    dev = {k: coqar_train[k][-i:] + canard_dev[k]
            for k in ['input', 'references', 'context']}
 
     return train, dev
 
 
 def get_train_dev(dataset_name, include_story):
-    if dataset_name == 'elda':
-        train, dev = get_elda_train_and_dev_sets(include_story)
+    if dataset_name == 'coqar':
+        train, dev = get_coqar_train_and_dev_sets(include_story)
     elif dataset_name == 'canard':
         train = get_canard_train_set(include_story)
         dev = get_canard_dev_set(include_story)
     elif dataset_name == 'mixed':
         train, dev = get_mixed_train_and_dev_sets(include_story)
-    elif dataset_name == 'nocontext':
-        train, dev = get_nocontext_train_and_dev(include_story)
     return train, dev
 
 def data_statistics():
     mixed_train, mixed_dev = get_mixed_train_and_dev_sets(False)
-    elda_train, elda_dev = get_elda_train_and_dev_sets(False)
+    coqar_train, coqar_dev = get_coqar_train_and_dev_sets(False)
     splits = {
-        'ELDA train (minus dev)' : elda_train,
-        'ELDA train (part of original train)': elda_dev,
-        'ELDA test (originally dev)' : get_elda_test_set(False),
+        'COQAR train (minus dev)' : coqar_train,
+        'COQAR train (part of original train)': coqar_dev,
+        'COQAR test (originally dev)' : get_coqar_test_set(False),
         'CANARD train' : get_canard_train_set(True),
         'CANARD dev' : get_canard_dev_set(True),
         'CANARD test' : get_canard_test_set(True),
@@ -346,30 +314,7 @@ class QRDataset(Dataset):
     def __getitem__(self, i):
         return self.rows[i]
 
-class QRDatasetForServer(Dataset):
-    def __init__(self,inputs,input_tokenizer,output_tokenizer):
-
-        X = input_tokenizer(inputs, padding=True, truncation=False)
-        Y = output_tokenizer(['' for _ in inputs], padding=True, truncation=False)
-
-        self.rows = []
-
-        for x, mask, y in zip(X['input_ids'], X['attention_mask'], Y['input_ids']):
-            self.rows.append({'input_ids': torch.tensor(x[-512:]),
-                              'attention_mask': torch.tensor(mask[-512:]),
-                              'labels': torch.tensor(y)})
-
-
-    def __len__(self):
-        return len(self.rows)
-
-    def __getitem__(self, i):
-        return self.rows[i]
 
 if __name__ == '__main__':
-    elda = get_elda_all_sets(True)
-    canard = get_canard_all_sets(True)
-    print('CANARD unanswerable questions ratio:', cannotanswer_ratio(canard))
-    print('CoQAR unanswerable questions ratio:', cannotanswer_ratio(elda))
     print(data_statistics())
-    print(elda_statistics())
+    print(coqar_statistics())

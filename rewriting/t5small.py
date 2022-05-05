@@ -1,17 +1,6 @@
 from transformers import T5ForConditionalGeneration, T5Tokenizer
-from . import config
-from . import qrdatasets
-
-DEFAULT_HPARAMS = {
-        'epochs' : 3,
-        'learning_rate' : 0.00005,
-        'batch_size' : 16,
-        'weight_decay' : 0.0,
-        'history_size' : 20,
-        'dropout_rate' : 0.1,
-        'include_story' : False
-    }
-
+import config
+import qrdatasets
 
 def get_input_tokenizer():
     tokenizer = T5Tokenizer.from_pretrained(config.T5v1_1_TOKENIZER_PATH, padding_side = 'left')
@@ -43,14 +32,3 @@ def make_dataset(data, hparams, cuda = False):
 
 def load_fine_tuned_model():
     return T5ForConditionalGeneration.from_pretrained('data/fine-tuned-models/t5-small')
-
-
-MODEL_DIC = {
-    'name' : 't5small',
-    'pretrained_getter': get_pretrained_model,
-    'fine_tuned_loader' : load_fine_tuned_model,
-    'dataset_maker' : make_dataset,
-    'input_tokenizer_getter' : get_input_tokenizer,
-    'output_tokenizer_getter' : get_output_tokenizer,
-    'default_hparams' : DEFAULT_HPARAMS
-}

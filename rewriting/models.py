@@ -2,21 +2,10 @@ import t5small
 from torch.utils.data import Dataset, DataLoader
 from transformers import Adafactor, Seq2SeqTrainer, TrainingArguments
 from torch.optim import AdamW
-import bartbase
-import config
-import os
 import torch
 import evaluation
-import json
 import qrdatasets
 from utils import *
-import pandas as pd
-
-
-MODEL_DICS = {
-    't5small' : t5small.MODEL_DIC,
-    'bartbase' : bartbase.MODEL_DIC
-}
 
 
 def get_scores(model, data, dataset_maker, output_tokenizer, hparams, save_path = None):
@@ -30,62 +19,6 @@ def get_scores(model, data, dataset_maker, output_tokenizer, hparams, save_path 
   
     return evaluation.evaluate(predictions, data['references'])
 
-def train_reformulation(args, hparams):
-    pass
-
-def train_dev_loop_old(args, hparams, log_dir_path = None):
-    train, dev = qrdatasets.get_train_dev(
-            args.dataset_name,
-            args.include_story) 
-        
-    model_dic = MODEL_DICS[args.model_name]
-    del hparams['epochs']
-    output_tokenizer = model_dic['output_tokenizer_getter']()
-    print(json.dumps(hparams, indent = 1))
-
-    # initializes datasets and model
-    trainset = model_dic['dataset_maker'](train, hparams)
-    devset = model_dic['dataset_maker'](dev, hparams)
-    qrdatasets.print_dataset_into_file(
-            trainset,
-            output_tokenizer,
-            log_dir_path + '/train_data.csv'
-        )
-
-    model = model_dic['pretrained_getter'](hparams['dropout_rate'])
-   
-    trainer = Seq2SeqTrainer(
-            model = model,
-            args = TrainingArguments(
-                "Test",
-                num_train_epochs = 1.0,
-                per_gpu_train_batch_size = 16),
-            train_dataset = trainset,
-            eval_dataset = devset)
-    score_list = []
-    for epoch in range(30):
-        j = 0
-        file_path = log_dir_path + '/predictions'
-        while os.path.exists(file_path + str(j)):
-            j += 1
-        file_path = file_path + str(j)
-
-        scores = get_scores(
-                model,
-                dev,
-                model_dic['dataset_maker'],
-                output_tokenizer,
-                hparams,
-                save_path = file_path
-        )
-        print(scores)
-        score_list.append(scores)
-        train_result = trainer.train(resume_from_checkpoint = True)
-    
-    print(score_list)
-    json_save(score_list, log_dir_path + '/scores', indent = 1)
-    trainer.save_model()
-
 
 def train_dev_loop(args, hparams, log_dir_path = None):
     
@@ -93,21 +26,20 @@ def train_dev_loop(args, hparams, log_dir_path = None):
             args.dataset_name,
             args.include_story
     ) 
-        
-    model_dic = MODEL_DICS[args.model_name]
+
     del hparams['epochs']
     print(json.dumps(hparams, indent = 1))
 
     # initializes datasets and model
-    trainset = model_dic['dataset_maker'](train, hparams, cuda=True)
-    output_tokenizer = model_dic['output_tokenizer_getter']()
+    trainset = t5small.make_dataset(train, hparams, cuda=True)
+    output_tokenizer = t5small.get_output_tokenizer()
     qrdatasets.print_dataset_into_file(
             trainset,
             output_tokenizer,
             log_dir_path + '/train_data.csv'
     )
 
-    model = model_dic['pretrained_getter'](hparams['dropout_rate'])
+    model = t5small.get_pretrained_model(hparams['dropout_rate'])
     model.cuda()
 
     dataloader = DataLoader(
@@ -134,7 +66,7 @@ def train_dev_loop(args, hparams, log_dir_path = None):
         scores = get_scores(
                 model,
                 dev,
-                model_dic['dataset_maker'],
+                t5small.make_dataset,
                 output_tokenizer,
                 hparams,
                 save_path = file_path
