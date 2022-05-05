@@ -1,5 +1,0 @@
-transformers==4.10.2
-torch==1.10
-pandas==1.3.1
-nltk==3.6.5
-sentencepiece==0.1.95
