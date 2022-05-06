@@ -26,6 +26,7 @@ The corpus CoQA contains passages from seven domains, which are public under the
  - Literature and Wikipedia passages are shared under CC BY-SA 4.0 license. 
  - Children's stories are collected from MCTest which comes with MSR-LA license. 
  - Middle/High school exam passages are collected from RACE which comes with its own license. 
- - News passages are collected from the DeepMind CNN dataset which comes with Apache license.
+ - News passages are collected from the DeepMind CNN dataset which comes with Apache license (see [K. M. Hermann, T. Kočiský and E. Grefenstette, L. Espeholt, W. Kay, M. Suleyman, P. Blunsom, Teaching Machines to Read and Comprehend. Advances in Neural Information Processing Systems (NIPS), 2015](http://arxiv.org/abs/1506.03340)).
+
 
 
